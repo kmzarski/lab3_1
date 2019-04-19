@@ -13,6 +13,7 @@ import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductData;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
 
 import java.util.ArrayList;
+import java.util.Random;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
@@ -82,13 +83,38 @@ public class BookKeeperTest {
     }
 
     @Test
-    public void shouldReturnOnesAfterOneTaxCalculatorUsingVerifyMethod(){
+    public void shouldReturnOnesAfterOneTaxCalculatorUsingVerifyMethod() {
         bookKeeper = new BookKeeper(invoiceFactory);
         when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
         when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
         requestItems.add(requestItem);
         bookKeeper.issuance(invoiceRequest, taxPolicy);
-        verify(taxPolicy,times(1)).calculateTax(any(),any());
+        verify(taxPolicy, times(1)).calculateTax(any(), any());
     }
 
+    @Test
+    public void shouldReturnRandomValueAfterOneTaxCalculator() {
+        bookKeeper = new BookKeeper(invoiceFactory);
+        when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
+        when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
+        Random generator = new Random();
+        int iterationNumber = generator.nextInt(100);
+        for (int i = 0; i < iterationNumber; i++) {
+            requestItems.add(requestItem);
+        }
+
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+        verify(taxPolicy, times(iterationNumber)).calculateTax(any(), any());
+    }
+
+    @Test
+    public void testingValueRemovingFromListAfterissuance() {
+        bookKeeper = new BookKeeper(invoiceFactory);
+        when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
+        when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
+        requestItems.add(requestItem);
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+        requestItems.remove(requestItems.size() - 1);
+        verify(taxPolicy, times(1)).calculateTax(any(), any());
+    }
 }
