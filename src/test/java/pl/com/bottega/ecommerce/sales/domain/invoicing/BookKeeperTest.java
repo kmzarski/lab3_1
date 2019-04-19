@@ -31,13 +31,13 @@ public class BookKeeperTest {
     private TaxPolicy taxPolicy;
     @Mock
     private Invoice invoice;
+    @Mock
+    private RequestItem requestItem;
 
     private BookKeeper bookKeeper;
 
     private ArrayList<InvoiceLine> invoiceLines;
     private ArrayList<RequestItem> requestItems;
-
-    private RequestItem requestItem;
 
     @Before
     public void setUp() throws Exception {
@@ -55,13 +55,21 @@ public class BookKeeperTest {
     @Test
     public void shouldReturnOneInvoice() {
         bookKeeper = new BookKeeper(invoiceFactory);
-        requestItem = mock(RequestItem.class);
         when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
         when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
-        //when(requestItem.getQuantity()).thenReturn(mock(Integer.class));
         requestItems.add(requestItem);
         bookKeeper.issuance(invoiceRequest, taxPolicy);
         assertThat(invoiceLines.size(), is(1));
+    }
 
+    @Test
+    public void shouldReturnTwoCountForCalculateTaxMethodForTwoInvoice() {
+        bookKeeper = new BookKeeper(invoiceFactory);
+        when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
+        when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
+        requestItems.add(requestItem);
+        requestItems.add(requestItem);
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+        assertThat(invoiceLines.size(), is(2));
     }
 }
