@@ -16,9 +16,8 @@ import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BookKeeperTest {
@@ -72,4 +71,24 @@ public class BookKeeperTest {
         bookKeeper.issuance(invoiceRequest, taxPolicy);
         assertThat(invoiceLines.size(), is(2));
     }
+
+    @Test
+    public void shouldReturnZeroCountForCalculateTaxMethodForZeroInvoice() {
+        bookKeeper = new BookKeeper(invoiceFactory);
+        when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
+        when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+        assertThat(invoiceLines.size(), is(0));
+    }
+
+    @Test
+    public void shouldReturnOnesAfterOneTaxCalculatorUsingVerifyMethod(){
+        bookKeeper = new BookKeeper(invoiceFactory);
+        when(requestItem.getProductData()).thenReturn(mock(ProductData.class));
+        when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
+        requestItems.add(requestItem);
+        bookKeeper.issuance(invoiceRequest, taxPolicy);
+        verify(taxPolicy,times(1)).calculateTax(any(),any());
+    }
+
 }
