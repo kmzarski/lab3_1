@@ -99,6 +99,7 @@ public class BookKeeperTest {
         when(requestItem.getTotalCost()).thenReturn(mock(Money.class));
         Random generator = new Random();
         int iterationNumber = generator.nextInt(100);
+
         for (int i = 0; i < iterationNumber; i++) {
             requestItems.add(requestItem);
         }
