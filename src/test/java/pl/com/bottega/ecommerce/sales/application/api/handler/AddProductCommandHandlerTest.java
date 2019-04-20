@@ -109,5 +109,16 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler.handle(addProductCommand);
         verify(reservationRepository,times(1)).save(reservation);
     }
+    @Test
+    public void testForSuggestionService(){
+        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
+                productRepository,
+                suggestionService,
+                clientRepository,
+                systemContext);
+        when(product.isAvailable()).thenReturn(false);
+        addProductCommandHandler.handle(addProductCommand);
+        verify(suggestionService).suggestEquivalent(product,client);
+    }
 }
 
