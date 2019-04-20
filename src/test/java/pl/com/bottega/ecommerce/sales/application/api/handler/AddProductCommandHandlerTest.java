@@ -62,6 +62,7 @@ public class AddProductCommandHandlerTest {
     private AddProductCommandHandler addProductCommandHandler;
 
     private ArgumentCaptor<Product> products;
+
     @Before
     public void setUp() throws Exception {
         when(reservationRepository.load(any(Id.class))).thenReturn(reservation);
@@ -75,7 +76,7 @@ public class AddProductCommandHandlerTest {
     }
 
     @Test
-    public void testForOneAvailableProducts() {
+    public void testReservationForOneAvailableProduct() {
         addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
                 productRepository,
                 suggestionService,
@@ -83,7 +84,30 @@ public class AddProductCommandHandlerTest {
                 systemContext);
         addProductCommandHandler.handle(addProductCommand);
         verify(reservation).add(products.capture(), Mockito.anyInt());
-        verify(product,times(1)).isAvailable();
+        verify(product, times(1)).isAvailable();
+    }
+
+    @Test
+    public void testForAddMethodOneUsage() {
+        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
+                productRepository,
+                suggestionService,
+                clientRepository,
+                systemContext);
+        addProductCommand = new AddProductCommand(new Id("1"), new Id("2"), 10);
+        addProductCommandHandler.handle(addProductCommand);
+        verify(reservation, times(1)).add(product, 10);
+    }
+
+    @Test
+    public void testForReservationRepository() {
+        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
+                productRepository,
+                suggestionService,
+                clientRepository,
+                systemContext);
+        addProductCommandHandler.handle(addProductCommand);
+        verify(reservationRepository,times(1)).save(reservation);
     }
 }
 
