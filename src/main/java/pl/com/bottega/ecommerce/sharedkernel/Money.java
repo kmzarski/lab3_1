@@ -147,4 +147,15 @@ public class Money {
 		return compatibleCurrency(other) && Objects.areEqual(denomination, other.denomination);
 	}
 
+	public void setDenomination(BigDecimal denomination) {
+		this.denomination = denomination;
+	}
+
+	public void setCurrencyCode(String currencyCode) {
+		this.currencyCode = currencyCode;
+	}
+
+	public BigDecimal getDenomination() {
+		return denomination;
+	}
 }
