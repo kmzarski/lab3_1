@@ -36,7 +36,7 @@ public class AddProductCommandHandlerBuilder {
     public AddProductCommandHandlerBuilder setSystemContext(SystemContext systemContext) {
         this.systemContext = systemContext;
         return this;
-    }
+    }   
 
     public AddProductCommandHandler build() {
         return new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, systemContext);
