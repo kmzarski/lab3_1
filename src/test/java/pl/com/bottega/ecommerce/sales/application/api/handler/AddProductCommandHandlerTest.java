@@ -73,15 +73,16 @@ public class AddProductCommandHandlerTest {
         // when(systemContext.getSystemUser().getClientId()).thenReturn(any(Id.class));
         when(product.isAvailable()).thenReturn(true);
         products = ArgumentCaptor.forClass(Product.class);
+        addProductCommandHandler = new AddProductCommandHandlerBuilder().setClientRepository(clientRepository)
+                .setProductRepository(productRepository)
+                .setReservationRepository(reservationRepository)
+                .setSuggestionService(suggestionService)
+                .setSystemContext(systemContext)
+                .bulid();
     }
 
     @Test
     public void testReservationForOneAvailableProduct() {
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
-                productRepository,
-                suggestionService,
-                clientRepository,
-                systemContext);
         addProductCommandHandler.handle(addProductCommand);
         verify(reservation).add(products.capture(), Mockito.anyInt());
         verify(product, times(1)).isAvailable();
@@ -89,11 +90,6 @@ public class AddProductCommandHandlerTest {
 
     @Test
     public void testForAddMethodOneUsage() {
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
-                productRepository,
-                suggestionService,
-                clientRepository,
-                systemContext);
         addProductCommand = new AddProductCommand(new Id("1"), new Id("2"), 10);
         addProductCommandHandler.handle(addProductCommand);
         verify(reservation, times(1)).add(product, 10);
@@ -101,24 +97,15 @@ public class AddProductCommandHandlerTest {
 
     @Test
     public void testForReservationRepository() {
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
-                productRepository,
-                suggestionService,
-                clientRepository,
-                systemContext);
         addProductCommandHandler.handle(addProductCommand);
-        verify(reservationRepository,times(1)).save(reservation);
+        verify(reservationRepository, times(1)).save(reservation);
     }
+
     @Test
-    public void testForSuggestionService(){
-        addProductCommandHandler = new AddProductCommandHandler(reservationRepository,
-                productRepository,
-                suggestionService,
-                clientRepository,
-                systemContext);
+    public void testForSuggestionService() {
         when(product.isAvailable()).thenReturn(false);
         addProductCommandHandler.handle(addProductCommand);
-        verify(suggestionService).suggestEquivalent(product,client);
+        verify(suggestionService).suggestEquivalent(product, client);
     }
 }
 
