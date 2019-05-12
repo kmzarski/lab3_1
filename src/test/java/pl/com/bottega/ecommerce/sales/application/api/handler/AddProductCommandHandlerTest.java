@@ -20,6 +20,7 @@ import pl.com.bottega.ecommerce.sales.domain.productscatalog.ProductType;
 import pl.com.bottega.ecommerce.sales.domain.reservation.Reservation;
 import pl.com.bottega.ecommerce.sales.domain.reservation.ReservationRepository;
 import pl.com.bottega.ecommerce.sharedkernel.Money;
+import pl.com.bottega.ecommerce.sharedkernel.exceptions.DomainOperationException.DomainOperationException;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
 
 import static org.hamcrest.Matchers.equalTo;
@@ -64,6 +65,7 @@ public class AddProductCommandHandlerTest {
         reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"), new Date());
         when(reservationRepository.load(any(Id.class))).thenReturn(reservation);
         when(productRepository.load(any(Id.class))).thenReturn(product);
+        when(suggestionService.suggestEquivalent(any(Product.class), any(Client.class))).thenReturn(product);
     }
 
     @Test
@@ -94,6 +96,12 @@ public class AddProductCommandHandlerTest {
         }
         verify(reservationRepository, times(randValue)).save(any());
         assertThat(true, is(true));
+    }
+
+    @Test(expected = DomainOperationException.class)
+    public void testForSuggestionServiceThrow() {
+        product.markAsRemoved();
+        addProductCommandHandler.handle(addProductCommand);
     }
 
 }
