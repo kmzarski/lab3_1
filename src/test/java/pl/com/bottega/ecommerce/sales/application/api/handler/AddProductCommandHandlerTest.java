@@ -28,6 +28,7 @@ import static org.hamcrest.Matchers.is;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Random;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -60,19 +61,39 @@ public class AddProductCommandHandlerTest {
         addProductCommandHandler =
                 new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, systemContext);
         product = new Product(Id.generate(), new Money(BigDecimal.TEN, Money.DEFAULT_CURRENCY), "pasta", ProductType.FOOD);
-        Reservation reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"), new Date());
-
+        reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"), new Date());
+        when(reservationRepository.load(any(Id.class))).thenReturn(reservation);
+        when(productRepository.load(any(Id.class))).thenReturn(product);
     }
 
     @Test
     public void testRepositoryForUsedOnce() {
-        when(reservationRepository.load(any(Id.class))).thenReturn(reservation);
-        when(productRepository.load(any(Id.class))).thenReturn(product);
         addProductCommandHandler.handle(addProductCommand);
         verify(reservationRepository, times(1)).load(any());
         verify(productRepository, times(1)).load(any());
         verify(reservationRepository, times(1)).save(any());
-        assertThat(true, is(equalTo(true)));
+        assertThat(true, is(true));
+    }
+
+    @Test
+    public void testForMulitpleLoadMethodUsage() {
+        int randValue = new Random().nextInt(100);
+        for (int i = 0; i < randValue; i++) {
+            addProductCommandHandler.handle(addProductCommand);
+        }
+        verify(productRepository, times(randValue)).load(any());
+        verify(reservationRepository, times(randValue)).load(any());
+        assertThat(true, is(true));
+    }
+
+    @Test
+    public void testForMulitpleSaveMethodUsage() {
+        int randValue = new Random().nextInt(100);
+        for (int i = 0; i < randValue; i++) {
+            addProductCommandHandler.handle(addProductCommand);
+        }
+        verify(reservationRepository, times(randValue)).save(any());
+        assertThat(true, is(true));
     }
 
 }
