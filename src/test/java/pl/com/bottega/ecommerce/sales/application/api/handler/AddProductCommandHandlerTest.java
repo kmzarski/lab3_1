@@ -1,12 +1,9 @@
 package pl.com.bottega.ecommerce.sales.application.api.handler;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.ClientData;
 import pl.com.bottega.ecommerce.canonicalmodel.publishedlanguage.Id;
@@ -23,14 +20,11 @@ import pl.com.bottega.ecommerce.sharedkernel.Money;
 import pl.com.bottega.ecommerce.sharedkernel.exceptions.DomainOperationException.DomainOperationException;
 import pl.com.bottega.ecommerce.system.application.SystemContext;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
-
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Random;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
@@ -49,20 +43,16 @@ public class AddProductCommandHandlerTest {
 
     private AddProductCommandHandler addProductCommandHandler;
     private AddProductCommand addProductCommand;
-    private Client client;
-    private SystemContext systemContext;
     private Product product;
-    private Reservation reservation;
+
 
     @Before
     public void setUp() {
         addProductCommand = new AddProductCommand(new Id("1"), new Id("1"), 100);
-        systemContext = new SystemContext();
-        client = new Client();
         addProductCommandHandler =
-                new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, systemContext);
+                new AddProductCommandHandler(reservationRepository, productRepository, suggestionService, clientRepository, new SystemContext());
         product = new Product(Id.generate(), new Money(BigDecimal.TEN, Money.DEFAULT_CURRENCY), "pasta", ProductType.FOOD);
-        reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"), new Date());
+        Reservation reservation = new Reservation(Id.generate(), Reservation.ReservationStatus.OPENED, new ClientData(Id.generate(), "name"), new Date());
         when(reservationRepository.load(any(Id.class))).thenReturn(reservation);
         when(productRepository.load(any(Id.class))).thenReturn(product);
         when(suggestionService.suggestEquivalent(any(Product.class), any(Client.class))).thenReturn(product);
@@ -103,6 +93,5 @@ public class AddProductCommandHandlerTest {
         product.markAsRemoved();
         addProductCommandHandler.handle(addProductCommand);
     }
-
 }
 
